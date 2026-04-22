@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>開店秘書 RPG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f0f1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 16px 48px;
+      font-family: 'Press Start 2P', monospace;
+    }
+
+    /* ── 頂部標題 ── */
+    .site-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .site-title {
+      font-size: 14px;
+      color: #f5a623;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .site-sub {
+      font-size: 7px;
+      color: #666;
+      line-height: 2;
+    }
+
+    /* ── 主容器 ── */
+    #app {
+      width: 100%;
+      max-width: 560px;
+      background: #1a1a2e;
+      border: 3px solid #4a4a6a;
+      padding: 20px;
+      color: #e8e8d0;
+    }
+
+    /* ── Top Bar ── */
+    .topbar {
+      display: flex; align-items: center; gap: 10px;
+      background: #16213e; border: 2px solid #4a4a6a;
+      padding: 10px 12px; margin-bottom: 14px;
+    }
+    .quest-label { font-size: 7px; color: #f5a623; }
+    .quest-title { font-size: 9px; color: #e8e8d0; margin-top: 3px; }
+    .time-pill {
+      margin-left: auto; font-size: 6px; color: #888;
+      border: 1px solid #4a4a6a; padding: 3px 8px;
+    }
+
+    /* ── Progress ── */
+    .progress-wrap {
+      display: flex; gap: 6px; align-items: center; margin-bottom: 14px;
+    }
+    .pip { width: 32px; height: 6px; background: #333; border: 1px solid #444; }
+    .pip.done { background: #f5a623; }
+    .pip.active { background: #f5a623; animation: pulse 1s ease-in-out infinite alternate; }
+    @keyframes pulse { from { opacity: 0.6 } to { opacity: 1 } }
+    .prog-txt { font-size: 6px; color: #888; margin-left: 4px; }
+
+    /* ── Dialog ── */
+    .dialog {
+      background: #16213e; border: 3px solid #e8e8d0;
+      padding: 14px; margin-bottom: 12px;
+    }
+    .speaker { font-size: 7px; color: #f5a623; margin-bottom: 8px; }
+    .dtext { font-size: 8px; line-height: 2; color: #e8e8d0; }
+    .cursor {
+      display: inline-block; width: 8px; height: 10px;
+      background: #e8e8d0; animation: blink .8s step-end infinite;
+      vertical-align: middle; margin-left: 2px;
+    }
+    @keyframes blink { 50% { opacity: 0 } }
+
+    /* ── Choices ── */
+    .choices { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .cbtn {
+      background: #ffffff; border: 3px solid #cccccc;
+      color: #1a1a2e; font-family: 'Press Start 2P', monospace;
+      font-size: 7px; padding: 12px 14px; cursor: pointer;
+      text-align: left; transition: border-color .15s, background .15s;
+      line-height: 1.8; display: flex; align-items: flex-start; gap: 10px;
+    }
+    .cbtn:hover { border-color: #f5a623; background: #fff9ee; }
+    .cbtn.selected { border-color: #f5a623; background: #f5a623; color: #1a1a2e; }
+    .cbtn.selected .carr { color: #1a1a2e; }
+    .carr { color: #f5a623; font-size: 8px; flex-shrink: 0; }
+
+    /* ── Input ── */
+    .irow { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .pinput {
+      flex: 1; background: #ffffff; border: 3px solid #cccccc;
+      color: #1a1a2e; font-family: 'Press Start 2P', monospace;
+      font-size: 8px; padding: 10px 12px; outline: none;
+    }
+    .pinput:focus { border-color: #f5a623; }
+    .pinput::placeholder { color: #aaa; }
+
+    /* ── Button ── */
+    .pbtn {
+      background: #f5a623; border: none; color: #1a1a2e;
+      font-family: 'Press Start 2P', monospace; font-size: 7px;
+      padding: 10px 14px; cursor: pointer; white-space: nowrap;
+      transition: background .1s; flex-shrink: 0;
+    }
+    .pbtn:hover { background: #e8930d; }
+
+    /* ── Toast ── */
+    .toast {
+      background: #27ae60; border: 2px solid #2ecc71;
+      color: #fff; font-family: 'Press Start 2P', monospace;
+      font-size: 7px; padding: 10px 14px; margin-bottom: 10px;
+      animation: slideIn .3s ease; line-height: 1.8;
+    }
+    @keyframes slideIn { from { transform: translateY(-8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+
+    /* ── Profile Card ── */
+    .profile-card {
+      background: #16213e; border: 3px solid #f5a623; padding: 16px; margin-top: 4px;
+    }
+    .pc-title { font-size: 8px; color: #f5a623; margin-bottom: 12px; text-align: center; }
+    .pc-row {
+      display: flex; align-items: flex-start; gap: 8px;
+      margin-bottom: 10px; padding-bottom: 10px;
+      border-bottom: 1px solid #2a2a4a;
+    }
+    .pc-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .pc-lbl { font-size: 6px; color: #888; min-width: 52px; flex-shrink: 0; line-height: 1.8; margin-top: 1px; }
+    .pc-val { font-size: 7px; color: #e8e8d0; line-height: 1.8; flex: 1; }
+    .pc-badge {
+      display: inline-block; background: #f5a623; color: #1a1a2e;
+      font-size: 6px; padding: 2px 8px; margin-top: 6px;
+    }
+
+    /* ── Reward ── */
+    .reward-box {
+      background: #0d2b1a; border: 2px solid #27ae60;
+      padding: 12px; margin-top: 10px; text-align: center;
+    }
+    .reward-title { font-size: 7px; color: #2ecc71; margin-bottom: 8px; }
+    .xp-big { font-size: 18px; color: #f5a623; }
+    .xp-sub { font-size: 6px; color: #888; margin-top: 4px; }
+    .badge-row { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+    .badge {
+      background: #16213e; border: 2px solid #f5a623;
+      font-size: 6px; color: #f5a623; padding: 6px 10px;
+      text-align: center; line-height: 1.8;
+    }
+
+    /* ── Next Button ── */
+    .next-btn {
+      width: 100%; background: #f5a623; border: none;
+      color: #1a1a2e; font-family: 'Press Start 2P', monospace;
+      font-size: 8px; padding: 14px; cursor: pointer; margin-top: 12px;
+      transition: background .1s;
+    }
+    .next-btn:hover { background: #e8930d; }
+
+    /* ── Coming Soon ── */
+    .coming-soon {
+      background: #16213e; border: 3px solid #4a4a6a;
+      padding: 24px; text-align: center; margin-top: 4px;
+    }
+    .cs-icon { font-size: 32px; margin-bottom: 12px; }
+    .cs-title { font-size: 10px; color: #f5a623; margin-bottom: 10px; }
+    .cs-desc { font-size: 7px; color: #888; line-height: 2; }
+
+    /* ── Mobile ── */
+    @media (max-width: 480px) {
+      body { padding: 12px 8px 32px; }
+      #app { padding: 14px; }
+      .site-title { font-size: 11px; }
+      .cbtn { font-size: 6px; padding: 10px 10px; }
+      .pinput { font-size: 7px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="site-header">
+    <div class="site-title">🏪 開店秘書 RPG</div>
+    <div class="site-sub">從零開始・手把手・帶你開店</div>
+  </div>
+
+  <div id="app">
+    <div class="topbar">
+      <div>
+        <div class="quest-label">第一章・夢想定位</div>
+        <div class="quest-title">關卡 1：認識你自己</div>
+      </div>
+      <div class="time-pill">⏱ 約 30 分鐘</div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="pip active" id="p0"></div>
+      <div class="pip" id="p1"></div>
+      <div class="pip" id="p2"></div>
+      <div class="pip" id="p3"></div>
+      <div class="pip" id="p4"></div>
+      <span class="prog-txt" id="prog-txt">問題 1 / 5</span>
+    </div>
+
+    <div id="toast-area"></div>
+
+    <div class="dialog" id="dialog">
+      <div class="speaker" id="speaker">村長 老王</div>
+      <div class="dtext" id="dtext">
+        勇者，歡迎來到開店冒險！<br>
+        在我們出發之前，<br>
+        讓我先認識一下你吧。<br>
+        你希望我怎麼稱呼你？
+        <span class="cursor"></span>
+      </div>
+    </div>
+
+    <div id="action-area"></div>
+  </div>
+
+  <script>
+    const G = { name:'', status:'', exp:'', reason:'', strength:'', xp:0 };
+
+    const pip = i => document.getElementById('p'+i);
+    const progTxt = document.getElementById('prog-txt');
+    const speaker = document.getElementById('speaker');
+    const dtext = document.getElementById('dtext');
+    const actionArea = document.getElementById('action-area');
+    const toastArea = document.getElementById('toast-area');
+
+    function setDialog(sp, txt) {
+      speaker.textContent = sp;
+      dtext.innerHTML = txt + '<span class="cursor"></span>';
+    }
+
+    function clearAction() { actionArea.innerHTML = ''; }
+
+    function showChoices(arr) {
+      clearAction();
+      const div = document.createElement('div');
+      div.className = 'choices';
+      arr.forEach(c => {
+        const b = document.createElement('button');
+        b.className = 'cbtn';
+        b.innerHTML = '<span class="carr">▶</span>' + c.label;
+        b.onclick = () => {
+          div.querySelectorAll('.cbtn').forEach(x => x.classList.remove('selected'));
+          b.classList.add('selected');
+          setTimeout(() => c.action(), 300);
+        };
+        div.appendChild(b);
+      });
+      actionArea.appendChild(div);
+    }
+
+    function showInput(ph, cb) {
+      clearAction();
+      const row = document.createElement('div');
+      row.className = 'irow';
+      const inp = document.createElement('input');
+      inp.className = 'pinput'; inp.placeholder = ph;
+      const btn = document.createElement('button');
+      btn.className = 'pbtn'; btn.textContent = '確定 ▶';
+      const go = () => {
+        const v = inp.value.trim(); if (!v) return;
+        btn.onclick = null; inp.onkeydown = null; cb(v);
+      };
+      btn.onclick = go;
+      inp.onkeydown = e => { if (e.key === 'Enter') go(); };
+      row.appendChild(inp); row.appendChild(btn);
+      actionArea.appendChild(row);
+      setTimeout(() => inp.focus(), 100);
+    }
+
+    function toast(msg) {
+      const t = document.createElement('div');
+      t.className = 'toast'; t.innerHTML = msg;
+      toastArea.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    function advancePip(i) {
+      if (i > 0) { pip(i-1).classList.remove('active'); pip(i-1).classList.add('done'); }
+      if (i < 5) pip(i).classList.add('active');
+      progTxt.textContent = '問題 ' + (i+1) + ' / 5';
+    }
+
+    function step0() {
+      advancePip(0);
+      setDialog('村長 老王', '勇者，歡迎來到開店冒險！<br>在我們出發之前，<br>讓我先認識一下你吧。<br>你希望我怎麼稱呼你？');
+      showInput('輸入你的稱呼或小名...', v => {
+        G.name = v;
+        toast('★ 勇者「' + v + '」正式登錄！');
+        setDialog('村長 老王', '「' + v + '」！這個名字很有力量！<br>很高興認識你～<br>那我先問問你，<br>目前你是什麼狀態呢？');
+        setTimeout(() => step1(), 400);
+      });
+    }
+
+    function step1() {
+      advancePip(1);
+      showChoices([
+        { label: '還在上班，利用空閒時間規劃', action: () => pickStatus('還在上班，利用空閒時間規劃') },
+        { label: '已離職，全心全意準備開店', action: () => pickStatus('已離職，全心全意準備開店') },
+        { label: '想先兼職創業，評估可行性', action: () => pickStatus('兼職創業，邊走邊評估') },
+        { label: '其他狀況（還在想）', action: () => pickStatus('其他，仍在規劃中') },
+      ]);
+    }
+
+    function pickStatus(s) {
+      G.status = s; G.xp += 20;
+      toast('+20 XP！狀態確認完成');
+      setDialog('老王', '了解！' + G.name + '，<br>「' + s + '」<br>每個狀態都有它的優勢。<br>接下來——<br>你有沒有餐飲相關的經驗呢？');
+      setTimeout(() => step2(), 300);
+    }
+
+    function step2() {
+      advancePip(2);
+      showChoices([
+        { label: '有正職餐飲工作經驗（1年以上）', action: () => pickExp('有正職餐飲工作經驗') },
+        { label: '有打工或兼職經驗', action: () => pickExp('有打工或兼職餐飲經驗') },
+        { label: '在家常做飯，對飲食很有熱情', action: () => pickExp('在家料理，對飲食充滿熱情') },
+        { label: '完全沒有，但我有強烈的學習意願', action: () => pickExp('無相關經驗，但學習意願強') },
+      ]);
+    }
+
+    function pickExp(e) {
+      G.exp = e; G.xp += 20;
+      toast('+20 XP！經驗值記錄完成');
+      setDialog('老王', '收到！「' + e + '」<br>這些都是寶貴的資本。<br><br>現在我想更了解你——<br>是什麼讓你萌生了<br>開店的念頭呢？');
+      setTimeout(() => step3(), 300);
+    }
+
+    function step3() {
+      advancePip(3);
+      showInput('說說你的故事，不用太長...', v => {
+        G.reason = v; G.xp += 30;
+        toast('+30 XP！開店動機解鎖！');
+        setDialog('老王', '「' + v + '」<br><br>謝謝你的分享。<br>這份初心會是你<br>撐過難關的力量。<br><br>最後一題——<br>你覺得自己最大的優勢是什麼？');
+        setTimeout(() => step4(), 400);
+      });
+    }
+
+    function step4() {
+      advancePip(4);
+      showChoices([
+        { label: '很會跟人互動，親和力強', action: () => pickStrength('親和力強，擅長人際互動') },
+        { label: '對數字敏感，擅長分析規劃', action: () => pickStrength('數字敏感，擅長分析規劃') },
+        { label: '有創意，擅長設計和品牌感', action: () => pickStrength('有創意，擅長品牌與設計') },
+        { label: '執行力強，說到做到', action: () => pickStrength('執行力強，行動派') },
+        { label: '廚藝或手藝很好', action: () => pickStrength('廚藝或手藝出色') },
+      ]);
+    }
+
+    function pickStrength(s) {
+      G.strength = s; G.xp += 30;
+      clearAction();
+      [0,1,2,3,4].forEach(i => { pip(i).classList.remove('active'); pip(i).classList.add('done'); });
+      progTxt.textContent = '完成！';
+      setDialog('老王', '「' + s + '」<br>這正是你的核心武器！<br><br>' + G.name + '，<br>你的冒險者檔案<br>已經建立完成了！');
+      setTimeout(() => showResult(), 800);
+    }
+
+    function showResult() {
+      clearAction();
+      const statusMap = {
+        '還在上班，利用空閒時間規劃': '穩健型',
+        '已離職，全心全意準備開店': '全力衝刺型',
+        '兼職創業，邊走邊評估': '彈性探索型',
+        '其他，仍在規劃中': '蓄勢待發型',
+      };
+      const typeLabel = statusMap[G.status] || '探索型';
+      const card = document.createElement('div');
+      card.className = 'profile-card';
+      card.innerHTML = `
+        <div class="pc-title">★ 冒險者檔案 ★</div>
+        <div class="pc-row">
+          <div class="pc-lbl">稱呼</div>
+          <div class="pc-val">${G.name}<div class="pc-badge">${typeLabel}創業者</div></div>
+        </div>
+        <div class="pc-row">
+          <div class="pc-lbl">目前狀態</div>
+          <div class="pc-val">${G.status}</div>
+        </div>
+        <div class="pc-row">
+          <div class="pc-lbl">餐飲經驗</div>
+          <div class="pc-val">${G.exp}</div>
+        </div>
+        <div class="pc-row">
+          <div class="pc-lbl">開店動機</div>
+          <div class="pc-val">${G.reason}</div>
+        </div>
+        <div class="pc-row">
+          <div class="pc-lbl">核心優勢</div>
+          <div class="pc-val">${G.strength}</div>
+        </div>
+        <div class="reward-box">
+          <div class="reward-title">★ 關卡完成獎勵 ★</div>
+          <div class="xp-big">+${G.xp} XP</div>
+          <div class="xp-sub">獲得成就</div>
+          <div class="badge-row">
+            <div class="badge">自我認知者<br>徽章</div>
+            <div class="badge">冒險者<br>檔案解鎖</div>
+          </div>
+        </div>
+        <button class="next-btn" onclick="showComingSoon()">前往關卡 2 ▶</button>
+      `;
+      actionArea.appendChild(card);
+      toast('★ 關卡 1 完成！冒險者檔案已建立！');
+    }
+
+    function showComingSoon() {
+      actionArea.innerHTML = `
+        <div class="coming-soon">
+          <div class="cs-icon">🔒</div>
+          <div class="cs-title">關卡 2 即將開放！</div>
+          <div class="cs-desc">
+            下一關：確定開店類型<br>
+            與目標客群<br><br>
+            敬請期待 ★
+          </div>
+        </div>
+      `;
+    }
+
+    step0();
+  </script>
+</body>
+</html>
