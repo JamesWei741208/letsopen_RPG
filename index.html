@@ -19,12 +19,17 @@
       --green2: #2ecc71;
       --white: #ffffff;
 
-      /* 字體大小 - 電腦版 */
-      --fs-xs: 11px;
-      --fs-sm: 13px;
-      --fs-md: 15px;
-      --fs-lg: 18px;
-      --fs-xl: 22px;
+      /* 流體字體：clamp(最小, 理想vw, 最大) */
+      --fs-xs:  clamp(12px, 1.8vw, 15px);
+      --fs-sm:  clamp(14px, 2.2vw, 18px);
+      --fs-md:  clamp(16px, 2.6vw, 22px);
+      --fs-lg:  clamp(18px, 3vw,   26px);
+      --fs-xl:  clamp(22px, 4vw,   34px);
+
+      /* 流體間距 */
+      --gap-sm: clamp(10px, 1.5vw, 16px);
+      --gap-md: clamp(14px, 2.2vw, 24px);
+      --gap-lg: clamp(20px, 3vw,   36px);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,99 +40,85 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 32px 20px 64px;
+      padding: var(--gap-lg) var(--gap-md) 80px;
       font-family: 'Press Start 2P', monospace;
       color: var(--text);
     }
 
-    /* ── 頂部標題 ── */
     .site-header {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: var(--gap-lg);
     }
     .site-title {
       font-size: var(--fs-xl);
       color: var(--gold);
-      letter-spacing: 3px;
-      margin-bottom: 10px;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--gap-sm);
     }
     .site-sub {
       font-size: var(--fs-xs);
       color: var(--muted);
-      line-height: 2.2;
+      line-height: 2.4;
     }
 
-    /* ── 主容器 ── */
     #app {
       width: 100%;
-      max-width: 640px;
+      max-width: 700px;
       background: var(--panel);
       border: 3px solid var(--border);
-      padding: 28px;
+      padding: var(--gap-lg);
     }
 
-    /* ── Top Bar ── */
     .topbar {
       display: flex;
-      align-items: center;
-      gap: 12px;
+      align-items: flex-start;
+      gap: var(--gap-sm);
       background: var(--panel2);
       border: 2px solid var(--border);
-      padding: 14px 16px;
-      margin-bottom: 20px;
+      padding: var(--gap-md);
+      margin-bottom: var(--gap-md);
+      flex-wrap: wrap;
     }
-    .quest-label { font-size: var(--fs-xs); color: var(--gold); margin-bottom: 6px; }
-    .quest-title { font-size: var(--fs-md); color: var(--text); }
+    .topbar-left { flex: 1; min-width: 0; }
+    .quest-label { font-size: var(--fs-xs); color: var(--gold); margin-bottom: 8px; }
+    .quest-title { font-size: var(--fs-md); color: var(--text); line-height: 1.6; }
     .time-pill {
-      margin-left: auto;
       font-size: var(--fs-xs);
       color: var(--muted);
       border: 1px solid var(--border);
-      padding: 5px 10px;
+      padding: 6px 12px;
       white-space: nowrap;
+      align-self: flex-start;
     }
 
-    /* ── Progress ── */
     .progress-wrap {
       display: flex;
-      gap: 8px;
+      gap: var(--gap-sm);
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: var(--gap-md);
     }
     .pip {
       flex: 1;
-      height: 8px;
+      height: clamp(7px, 1.2vw, 11px);
       background: #333;
       border: 1px solid #444;
     }
     .pip.done { background: var(--gold); }
-    .pip.active {
-      background: var(--gold);
-      animation: pulse 1s ease-in-out infinite alternate;
-    }
+    .pip.active { background: var(--gold); animation: pulse 1s ease-in-out infinite alternate; }
     @keyframes pulse { from { opacity: 0.5 } to { opacity: 1 } }
-    .prog-txt { font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; }
+    .prog-txt { font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; flex-shrink: 0; }
 
-    /* ── Dialog ── */
     .dialog {
       background: var(--panel2);
       border: 3px solid var(--text);
-      padding: 20px;
-      margin-bottom: 16px;
+      padding: var(--gap-md);
+      margin-bottom: var(--gap-md);
     }
-    .speaker {
-      font-size: var(--fs-sm);
-      color: var(--gold);
-      margin-bottom: 12px;
-    }
-    .dtext {
-      font-size: var(--fs-sm);
-      line-height: 2.4;
-      color: var(--text);
-    }
+    .speaker { font-size: var(--fs-sm); color: var(--gold); margin-bottom: var(--gap-sm); }
+    .dtext { font-size: var(--fs-sm); line-height: 2.6; color: var(--text); }
     .cursor {
       display: inline-block;
-      width: 10px; height: 14px;
+      width: 0.65em; height: 1.1em;
       background: var(--text);
       animation: blink .8s step-end infinite;
       vertical-align: middle;
@@ -135,193 +126,116 @@
     }
     @keyframes blink { 50% { opacity: 0 } }
 
-    /* ── Choices ── */
-    .choices {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
+    .choices { display: flex; flex-direction: column; gap: var(--gap-sm); margin-bottom: var(--gap-sm); }
     .cbtn {
       background: var(--white);
       border: 3px solid #ccc;
       color: #1a1a2e;
       font-family: 'Press Start 2P', monospace;
       font-size: var(--fs-sm);
-      padding: 16px 18px;
+      padding: var(--gap-md);
       cursor: pointer;
       text-align: left;
       transition: border-color .15s, background .15s;
       line-height: 2;
       display: flex;
       align-items: flex-start;
-      gap: 12px;
+      gap: var(--gap-sm);
     }
     .cbtn:hover { border-color: var(--gold); background: #fff9ee; }
     .cbtn.selected { border-color: var(--gold); background: var(--gold); color: #1a1a2e; }
     .cbtn.selected .carr { color: #1a1a2e; }
     .carr { color: var(--gold); font-size: var(--fs-md); flex-shrink: 0; margin-top: 2px; }
 
-    /* ── Input ── */
-    .irow { display: flex; gap: 10px; align-items: stretch; margin-bottom: 12px; }
+    .irow { display: flex; gap: var(--gap-sm); margin-bottom: var(--gap-sm); flex-wrap: wrap; }
     .pinput {
-      flex: 1;
+      flex: 1; min-width: 200px;
       background: var(--white);
       border: 3px solid #ccc;
       color: #1a1a2e;
       font-family: 'Press Start 2P', monospace;
       font-size: var(--fs-sm);
-      padding: 14px 16px;
+      padding: var(--gap-md);
       outline: none;
     }
     .pinput:focus { border-color: var(--gold); }
-    .pinput::placeholder { color: #aaa; }
+    .pinput::placeholder { color: #bbb; }
 
-    /* ── Button ── */
     .pbtn {
       background: var(--gold);
       border: none;
       color: #1a1a2e;
       font-family: 'Press Start 2P', monospace;
       font-size: var(--fs-sm);
-      padding: 14px 20px;
+      padding: var(--gap-md) var(--gap-lg);
       cursor: pointer;
       white-space: nowrap;
       transition: background .1s;
-      flex-shrink: 0;
     }
     .pbtn:hover { background: var(--gold-dark); }
 
-    /* ── Toast ── */
     .toast {
       background: var(--green);
       border: 2px solid var(--green2);
       color: #fff;
       font-family: 'Press Start 2P', monospace;
       font-size: var(--fs-xs);
-      padding: 12px 16px;
-      margin-bottom: 12px;
+      padding: var(--gap-sm) var(--gap-md);
+      margin-bottom: var(--gap-sm);
       animation: slideIn .3s ease;
-      line-height: 2;
+      line-height: 2.2;
     }
     @keyframes slideIn {
       from { transform: translateY(-8px); opacity: 0 }
-      to { transform: translateY(0); opacity: 1 }
+      to   { transform: translateY(0); opacity: 1 }
     }
 
-    /* ── Profile Card ── */
     .profile-card {
       background: var(--panel2);
       border: 3px solid var(--gold);
-      padding: 24px;
-      margin-top: 4px;
+      padding: var(--gap-lg);
     }
-    .pc-title {
-      font-size: var(--fs-md);
-      color: var(--gold);
-      margin-bottom: 20px;
-      text-align: center;
-    }
+    .pc-title { font-size: var(--fs-md); color: var(--gold); margin-bottom: var(--gap-lg); text-align: center; }
     .pc-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 14px;
-      padding-bottom: 14px;
+      display: flex; align-items: flex-start; gap: var(--gap-md);
+      margin-bottom: var(--gap-md); padding-bottom: var(--gap-md);
       border-bottom: 1px solid #2a2a4a;
     }
     .pc-row:last-of-type { border-bottom: none; }
-    .pc-lbl {
-      font-size: var(--fs-xs);
-      color: var(--muted);
-      min-width: 72px;
-      flex-shrink: 0;
-      line-height: 2;
-      margin-top: 2px;
-    }
-    .pc-val {
-      font-size: var(--fs-sm);
-      color: var(--text);
-      line-height: 2;
-      flex: 1;
-    }
-    .pc-badge {
-      display: inline-block;
-      background: var(--gold);
-      color: #1a1a2e;
-      font-size: var(--fs-xs);
-      padding: 4px 10px;
-      margin-top: 8px;
-    }
+    .pc-lbl { font-size: var(--fs-xs); color: var(--muted); min-width: clamp(64px, 10vw, 96px); flex-shrink: 0; line-height: 2.2; }
+    .pc-val { font-size: var(--fs-sm); color: var(--text); line-height: 2.2; flex: 1; }
+    .pc-badge { display: inline-block; background: var(--gold); color: #1a1a2e; font-size: var(--fs-xs); padding: 4px 12px; margin-top: 8px; }
 
-    /* ── Reward ── */
     .reward-box {
-      background: #0d2b1a;
-      border: 2px solid var(--green);
-      padding: 20px;
-      margin-top: 16px;
-      text-align: center;
+      background: #0d2b1a; border: 2px solid var(--green);
+      padding: var(--gap-lg); margin-top: var(--gap-md); text-align: center;
     }
-    .reward-title { font-size: var(--fs-sm); color: var(--green2); margin-bottom: 12px; }
-    .xp-big { font-size: 28px; color: var(--gold); }
-    .xp-sub { font-size: var(--fs-xs); color: var(--muted); margin-top: 6px; }
-    .badge-row { display: flex; justify-content: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    .reward-title { font-size: var(--fs-sm); color: var(--green2); margin-bottom: var(--gap-md); }
+    .xp-big { font-size: clamp(28px, 5vw, 44px); color: var(--gold); }
+    .xp-sub { font-size: var(--fs-xs); color: var(--muted); margin-top: 8px; }
+    .badge-row { display: flex; justify-content: center; gap: var(--gap-sm); margin-top: var(--gap-md); flex-wrap: wrap; }
     .badge {
-      background: var(--panel2);
-      border: 2px solid var(--gold);
-      font-size: var(--fs-xs);
-      color: var(--gold);
-      padding: 10px 14px;
-      text-align: center;
-      line-height: 2;
+      background: var(--panel2); border: 2px solid var(--gold);
+      font-size: var(--fs-xs); color: var(--gold);
+      padding: var(--gap-sm) var(--gap-md); text-align: center; line-height: 2;
     }
 
-    /* ── Next Button ── */
     .next-btn {
-      width: 100%;
-      background: var(--gold);
-      border: none;
-      color: #1a1a2e;
-      font-family: 'Press Start 2P', monospace;
-      font-size: var(--fs-md);
-      padding: 18px;
-      cursor: pointer;
-      margin-top: 16px;
-      transition: background .1s;
+      width: 100%; background: var(--gold); border: none;
+      color: #1a1a2e; font-family: 'Press Start 2P', monospace;
+      font-size: var(--fs-md); padding: var(--gap-md);
+      cursor: pointer; margin-top: var(--gap-md);
+      transition: background .1s; line-height: 1.8;
     }
     .next-btn:hover { background: var(--gold-dark); }
 
-    /* ── Coming Soon ── */
     .coming-soon {
-      background: var(--panel2);
-      border: 3px solid var(--border);
-      padding: 40px 24px;
-      text-align: center;
-      margin-top: 4px;
+      background: var(--panel2); border: 3px solid var(--border);
+      padding: var(--gap-lg); text-align: center; margin-top: 4px;
     }
-    .cs-icon { font-size: 48px; margin-bottom: 16px; }
-    .cs-title { font-size: var(--fs-lg); color: var(--gold); margin-bottom: 16px; }
-    .cs-desc { font-size: var(--fs-sm); color: var(--muted); line-height: 2.4; }
-
-    /* ── Mobile ── */
-    @media (max-width: 480px) {
-      :root {
-        --fs-xs: 10px;
-        --fs-sm: 11px;
-        --fs-md: 13px;
-        --fs-lg: 15px;
-        --fs-xl: 17px;
-      }
-      body { padding: 16px 12px 48px; }
-      #app { padding: 16px; }
-      .topbar { padding: 12px; flex-wrap: wrap; gap: 8px; }
-      .time-pill { margin-left: 0; }
-      .cbtn { padding: 14px 12px; }
-      .pinput { padding: 12px; }
-      .pbtn { padding: 12px 14px; }
-      .irow { flex-direction: column; }
-      .pbtn { width: 100%; text-align: center; }
-    }
+    .cs-icon { font-size: clamp(40px, 7vw, 60px); margin-bottom: var(--gap-md); }
+    .cs-title { font-size: var(--fs-lg); color: var(--gold); margin-bottom: var(--gap-md); }
+    .cs-desc { font-size: var(--fs-sm); color: var(--muted); line-height: 2.6; }
   </style>
 </head>
 <body>
@@ -333,7 +247,7 @@
 
   <div id="app">
     <div class="topbar">
-      <div>
+      <div class="topbar-left">
         <div class="quest-label">第一章・夢想定位</div>
         <div class="quest-title">關卡 1：認識你自己</div>
       </div>
@@ -367,7 +281,6 @@
 
   <script>
     const G = { name:'', status:'', exp:'', reason:'', strength:'', xp:0 };
-
     const pip = i => document.getElementById('p'+i);
     const progTxt = document.getElementById('prog-txt');
     const speaker = document.getElementById('speaker');
@@ -379,7 +292,6 @@
       speaker.textContent = sp;
       dtext.innerHTML = txt + '<span class="cursor"></span>';
     }
-
     function clearAction() { actionArea.innerHTML = ''; }
 
     function showChoices(arr) {
@@ -447,9 +359,9 @@
       advancePip(1);
       showChoices([
         { label: '還在上班，利用空閒時間規劃', action: () => pickStatus('還在上班，利用空閒時間規劃') },
-        { label: '已離職，全心全意準備開店', action: () => pickStatus('已離職，全心全意準備開店') },
-        { label: '想先兼職創業，評估可行性', action: () => pickStatus('兼職創業，邊走邊評估') },
-        { label: '其他狀況（還在想）', action: () => pickStatus('其他，仍在規劃中') },
+        { label: '已離職，全心全意準備開店',   action: () => pickStatus('已離職，全心全意準備開店') },
+        { label: '想先兼職創業，評估可行性',   action: () => pickStatus('兼職創業，邊走邊評估') },
+        { label: '其他狀況（還在想）',         action: () => pickStatus('其他，仍在規劃中') },
       ]);
     }
 
@@ -464,8 +376,8 @@
       advancePip(2);
       showChoices([
         { label: '有正職餐飲工作經驗（1年以上）', action: () => pickExp('有正職餐飲工作經驗') },
-        { label: '有打工或兼職經驗', action: () => pickExp('有打工或兼職餐飲經驗') },
-        { label: '在家常做飯，對飲食很有熱情', action: () => pickExp('在家料理，對飲食充滿熱情') },
+        { label: '有打工或兼職經驗',               action: () => pickExp('有打工或兼職餐飲經驗') },
+        { label: '在家常做飯，對飲食很有熱情',     action: () => pickExp('在家料理，對飲食充滿熱情') },
         { label: '完全沒有，但我有強烈的學習意願', action: () => pickExp('無相關經驗，但學習意願強') },
       ]);
     }
@@ -490,21 +402,18 @@
     function step4() {
       advancePip(4);
       showChoices([
-        { label: '很會跟人互動，親和力強', action: () => pickStrength('親和力強，擅長人際互動') },
+        { label: '很會跟人互動，親和力強',   action: () => pickStrength('親和力強，擅長人際互動') },
         { label: '對數字敏感，擅長分析規劃', action: () => pickStrength('數字敏感，擅長分析規劃') },
         { label: '有創意，擅長設計和品牌感', action: () => pickStrength('有創意，擅長品牌與設計') },
-        { label: '執行力強，說到做到', action: () => pickStrength('執行力強，行動派') },
-        { label: '廚藝或手藝很好', action: () => pickStrength('廚藝或手藝出色') },
+        { label: '執行力強，說到做到',       action: () => pickStrength('執行力強，行動派') },
+        { label: '廚藝或手藝很好',           action: () => pickStrength('廚藝或手藝出色') },
       ]);
     }
 
     function pickStrength(s) {
       G.strength = s; G.xp += 30;
       clearAction();
-      [0,1,2,3,4].forEach(i => {
-        pip(i).classList.remove('active');
-        pip(i).classList.add('done');
-      });
+      [0,1,2,3,4].forEach(i => { pip(i).classList.remove('active'); pip(i).classList.add('done'); });
       progTxt.textContent = '完成！';
       setDialog('老王', '「' + s + '」<br>這正是你的核心武器！<br><br>' + G.name + '，<br>你的冒險者檔案<br>已經建立完成了！');
       setTimeout(() => showResult(), 800);
@@ -514,35 +423,20 @@
       clearAction();
       const statusMap = {
         '還在上班，利用空閒時間規劃': '穩健型',
-        '已離職，全心全意準備開店': '全力衝刺型',
-        '兼職創業，邊走邊評估': '彈性探索型',
-        '其他，仍在規劃中': '蓄勢待發型',
+        '已離職，全心全意準備開店':   '全力衝刺型',
+        '兼職創業，邊走邊評估':       '彈性探索型',
+        '其他，仍在規劃中':           '蓄勢待發型',
       };
       const typeLabel = statusMap[G.status] || '探索型';
       const card = document.createElement('div');
       card.className = 'profile-card';
       card.innerHTML = `
         <div class="pc-title">★ 冒險者檔案 ★</div>
-        <div class="pc-row">
-          <div class="pc-lbl">稱呼</div>
-          <div class="pc-val">${G.name}<div class="pc-badge">${typeLabel}創業者</div></div>
-        </div>
-        <div class="pc-row">
-          <div class="pc-lbl">目前狀態</div>
-          <div class="pc-val">${G.status}</div>
-        </div>
-        <div class="pc-row">
-          <div class="pc-lbl">餐飲經驗</div>
-          <div class="pc-val">${G.exp}</div>
-        </div>
-        <div class="pc-row">
-          <div class="pc-lbl">開店動機</div>
-          <div class="pc-val">${G.reason}</div>
-        </div>
-        <div class="pc-row">
-          <div class="pc-lbl">核心優勢</div>
-          <div class="pc-val">${G.strength}</div>
-        </div>
+        <div class="pc-row"><div class="pc-lbl">稱呼</div><div class="pc-val">${G.name}<div class="pc-badge">${typeLabel}創業者</div></div></div>
+        <div class="pc-row"><div class="pc-lbl">目前狀態</div><div class="pc-val">${G.status}</div></div>
+        <div class="pc-row"><div class="pc-lbl">餐飲經驗</div><div class="pc-val">${G.exp}</div></div>
+        <div class="pc-row"><div class="pc-lbl">開店動機</div><div class="pc-val">${G.reason}</div></div>
+        <div class="pc-row"><div class="pc-lbl">核心優勢</div><div class="pc-val">${G.strength}</div></div>
         <div class="reward-box">
           <div class="reward-title">★ 關卡完成獎勵 ★</div>
           <div class="xp-big">+${G.xp} XP</div>
@@ -563,11 +457,7 @@
         <div class="coming-soon">
           <div class="cs-icon">🔒</div>
           <div class="cs-title">關卡 2 即將開放！</div>
-          <div class="cs-desc">
-            下一關：確定開店類型<br>
-            與目標客群<br><br>
-            敬請期待 ★
-          </div>
+          <div class="cs-desc">下一關：確定開店類型<br>與目標客群<br><br>敬請期待 ★</div>
         </div>
       `;
     }
