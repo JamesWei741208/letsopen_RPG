@@ -397,7 +397,7 @@
     // ── Supabase 初始化 ──
     const SUPABASE_URL = 'https://dwcevlrzwqngkmdguijw.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2V2bHJ6d3FuZ2ttZGd1aWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMjk0MTcsImV4cCI6MjA5MjYwNTQxN30.qXqgMp0DUw-iyRy6r6Lszh7r5GDbMLqZft5e1VUH8b4';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null;
 
@@ -405,21 +405,21 @@
 
     // ── 登入/登出 ──
     async function loginWithGoogle() {
-      await supabase.auth.signInWithOAuth({
+      await db.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: 'https://letsopen-rpg.vercel.app' }
       });
     }
 
     async function logout() {
-      await supabase.auth.signOut();
+      await db.auth.signOut();
       location.reload();
     }
 
     // ── 儲存進度 ──
     async function saveProgress() {
       if (!currentUser) return;
-      await supabase.from('user_progress').upsert({
+      await db.from('user_progress').upsert({
         user_id: currentUser.id,
         current_quest: 1,
         xp: G.xp,
@@ -455,35 +455,47 @@
 
     // ── 初始化 ──
     async function init() {
-      const { data: { session } } = await supabase.auth.getSession();
+      try {
+        // 3秒內沒回應就直接跳登入畫面
+        const sessionPromise = db.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 3000)
+        );
 
-      if (!session) {
+        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise])
+          .catch(() => ({ data: { session: null } }));
+
+        if (!session) {
+          showScreen('login');
+          return;
+        }
+
+        currentUser = session.user;
+        const email = currentUser.email || '';
+        const displayName = currentUser.user_metadata?.full_name || email.split('@')[0];
+        document.getElementById('user-name').textContent = displayName;
+
+        // 讀取進度
+        const progress = await loadProgress();
+        if (progress?.profile?.name) {
+          G.name = progress.profile.name;
+          G.status = progress.profile.status || '';
+          G.exp = progress.profile.exp || '';
+          G.reason = progress.profile.reason || '';
+          G.strength = progress.profile.strength || '';
+          G.xp = progress.xp || 0;
+        }
+
+        showScreen('game');
+        step0();
+      } catch (e) {
+        // 任何錯誤都跳登入畫面
         showScreen('login');
-        return;
       }
-
-      currentUser = session.user;
-      const email = currentUser.email || '';
-      const displayName = currentUser.user_metadata?.full_name || email.split('@')[0];
-      document.getElementById('user-name').textContent = displayName;
-
-      // 讀取進度
-      const progress = await loadProgress();
-      if (progress?.profile?.name) {
-        G.name = progress.profile.name;
-        G.status = progress.profile.status || '';
-        G.exp = progress.profile.exp || '';
-        G.reason = progress.profile.reason || '';
-        G.strength = progress.profile.strength || '';
-        G.xp = progress.xp || 0;
-      }
-
-      showScreen('game');
-      step0();
     }
 
     // 監聽登入狀態變化
-    supabase.auth.onAuthStateChange((event, session) => {
+    db.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         init();
       }
