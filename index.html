@@ -436,7 +436,7 @@
     // ── 讀取進度 ──
     async function loadProgress() {
       if (!currentUser) return null;
-      const { data } = await supabase
+      const { data } = await db
         .from('user_progress')
         .select('*')
         .eq('user_id', currentUser.id)
