@@ -481,21 +481,41 @@
       }
     }
 
-    // 啟動 — 最多等 3 秒，否則直接跳登入
-    const initTimeout = setTimeout(() => {
-      console.log('timeout: showing login');
-      showScreen('login');
-    }, 3000);
+    // 啟動
+    window.addEventListener('load', async () => {
+      console.log('page loaded, starting init');
 
-    // 監聽登入狀態（處理 Google OAuth callback）
-    db.auth.onAuthStateChange(async (event, session) => {
-      console.log('auth:', event, session?.user?.email);
-      clearTimeout(initTimeout);
-      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
-        await startGame(session);
-      } else if (event === 'INITIAL_SESSION' && !session) {
+      // 最多等 4 秒
+      const t = setTimeout(() => {
+        console.log('timeout!');
         showScreen('login');
-      } else if (event === 'SIGNED_OUT') {
+      }, 4000);
+
+      try {
+        // 先檢查現有 session
+        const { data: { session }, error } = await db.auth.getSession();
+        console.log('getSession done', session?.user?.email, error);
+        clearTimeout(t);
+
+        if (session) {
+          await startGame(session);
+        } else {
+          showScreen('login');
+        }
+
+        // 再監聽之後的狀態變化
+        db.auth.onAuthStateChange(async (event, session) => {
+          console.log('auth change:', event, session?.user?.email);
+          if (event === 'SIGNED_IN' && session) {
+            await startGame(session);
+          } else if (event === 'SIGNED_OUT') {
+            showScreen('login');
+          }
+        });
+
+      } catch(e) {
+        console.error('init error:', e);
+        clearTimeout(t);
         showScreen('login');
       }
     });
