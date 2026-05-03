@@ -436,12 +436,18 @@
     // ── 讀取進度 ──
     async function loadProgress() {
       if (!currentUser) return null;
-      const { data } = await db
-        .from('user_progress')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .single();
-      return data;
+      try {
+        const { data, error } = await db
+          .from('user_progress')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .maybeSingle();
+        if (error) { console.log('loadProgress error', error); return null; }
+        return data;
+      } catch(e) {
+        console.log('loadProgress exception', e);
+        return null;
+      }
     }
 
     // ── 畫面切換 ──
@@ -474,7 +480,7 @@
 
         console.log('showing game screen');
         showScreen('game');
-        step0();
+        setTimeout(() => step0(), 100);
       } catch (e) {
         console.error('startGame error', e);
         showScreen('login');
