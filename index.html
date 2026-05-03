@@ -455,12 +455,14 @@
     // ── 初始化 ──
     async function startGame(session) {
       try {
+        console.log('startGame called', session.user.email);
         currentUser = session.user;
         const email = currentUser.email || '';
         const displayName = currentUser.user_metadata?.full_name || email.split('@')[0];
         document.getElementById('user-name').textContent = displayName;
 
         const progress = await loadProgress();
+        console.log('progress loaded', progress);
         if (progress?.profile?.name) {
           G.name = progress.profile.name;
           G.status = progress.profile.status || '';
@@ -470,17 +472,21 @@
           G.xp = progress.xp || 0;
         }
 
+        console.log('showing game screen');
         showScreen('game');
         step0();
       } catch (e) {
+        console.error('startGame error', e);
         showScreen('login');
       }
     }
 
     async function init() {
       try {
+        console.log('init started');
         // 監聽登入狀態（包含 Google OAuth callback）
         db.auth.onAuthStateChange(async (event, session) => {
+          console.log('auth state changed', event, session?.user?.email);
           if (event === 'SIGNED_IN' && session) {
             await startGame(session);
           } else if (event === 'SIGNED_OUT') {
@@ -489,13 +495,16 @@
         });
 
         // 檢查現有 session
+        console.log('checking session...');
         const { data: { session } } = await db.auth.getSession();
+        console.log('session result', session?.user?.email);
         if (session) {
           await startGame(session);
         } else {
           showScreen('login');
         }
       } catch (e) {
+        console.error('init error', e);
         showScreen('login');
       }
     }
