@@ -515,7 +515,7 @@
           if (event === 'SIGNED_IN' && session) {
             await startGame(session);
           } else if (event === 'SIGNED_OUT') {
-            showScreen('login');
+            location.reload();
           }
         });
 
