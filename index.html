@@ -453,28 +453,13 @@
     }
 
     // ── 初始化 ──
-    async function init() {
+    async function startGame(session) {
       try {
-        // 3秒內沒回應就直接跳登入畫面
-        const sessionPromise = db.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), 3000)
-        );
-
-        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise])
-          .catch(() => ({ data: { session: null } }));
-
-        if (!session) {
-          showScreen('login');
-          return;
-        }
-
         currentUser = session.user;
         const email = currentUser.email || '';
         const displayName = currentUser.user_metadata?.full_name || email.split('@')[0];
         document.getElementById('user-name').textContent = displayName;
 
-        // 讀取進度
         const progress = await loadProgress();
         if (progress?.profile?.name) {
           G.name = progress.profile.name;
@@ -488,17 +473,32 @@
         showScreen('game');
         step0();
       } catch (e) {
-        // 任何錯誤都跳登入畫面
         showScreen('login');
       }
     }
 
-    // 監聽登入狀態變化
-    db.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        init();
+    async function init() {
+      try {
+        // 監聽登入狀態（包含 Google OAuth callback）
+        db.auth.onAuthStateChange(async (event, session) => {
+          if (event === 'SIGNED_IN' && session) {
+            await startGame(session);
+          } else if (event === 'SIGNED_OUT') {
+            showScreen('login');
+          }
+        });
+
+        // 檢查現有 session
+        const { data: { session } } = await db.auth.getSession();
+        if (session) {
+          await startGame(session);
+        } else {
+          showScreen('login');
+        }
+      } catch (e) {
+        showScreen('login');
       }
-    });
+    }
 
     // ── 遊戲邏輯 ──
     const pip = i => document.getElementById('p' + i);
