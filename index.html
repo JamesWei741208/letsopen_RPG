@@ -8,333 +8,92 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg: #0f0f1a;
-      --panel: #1a1a2e;
-      --panel2: #16213e;
-      --border: #4a4a6a;
-      --gold: #f5a623;
-      --gold-dark: #e8930d;
-      --text: #e8e8d0;
-      --muted: #888888;
-      --green: #27ae60;
-      --green2: #2ecc71;
-      --red: #e74c3c;
-      --white: #ffffff;
-
-      --fs-xs: clamp(12px, 1.8vw, 15px);
-      --fs-sm: clamp(14px, 2.2vw, 18px);
-      --fs-md: clamp(16px, 2.6vw, 22px);
-      --fs-lg: clamp(18px, 3vw, 26px);
-      --fs-xl: clamp(22px, 4vw, 34px);
-
-      --gap-sm: clamp(10px, 1.5vw, 16px);
-      --gap-md: clamp(14px, 2.2vw, 24px);
-      --gap-lg: clamp(20px, 3vw, 36px);
+      --bg: #0f0f1a; --panel: #1a1a2e; --panel2: #16213e; --border: #4a4a6a;
+      --gold: #f5a623; --gold-dark: #e8930d; --text: #e8e8d0; --muted: #888;
+      --green: #27ae60; --green2: #2ecc71; --red: #e74c3c; --white: #fff;
+      --fs-xs: clamp(12px,1.8vw,15px); --fs-sm: clamp(14px,2.2vw,18px);
+      --fs-md: clamp(16px,2.6vw,22px); --fs-lg: clamp(18px,3vw,26px);
+      --fs-xl: clamp(22px,4vw,34px);
+      --gap-sm: clamp(10px,1.5vw,16px); --gap-md: clamp(14px,2.2vw,24px);
+      --gap-lg: clamp(20px,3vw,36px);
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: var(--gap-lg) var(--gap-md) 80px;
-      font-family: 'Press Start 2P', monospace;
-      color: var(--text);
-    }
-
-    /* ── 登入頁面 ── */
-    #login-screen {
-      width: 100%;
-      max-width: 480px;
-      text-align: center;
-      padding-top: 10vh;
-    }
-    .login-title {
-      font-size: var(--fs-xl);
-      color: var(--gold);
-      margin-bottom: var(--gap-sm);
-      line-height: 1.6;
-    }
-    .login-sub {
-      font-size: var(--fs-xs);
-      color: var(--muted);
-      line-height: 2.4;
-      margin-bottom: var(--gap-lg);
-    }
-    .login-box {
-      background: var(--panel);
-      border: 3px solid var(--border);
-      padding: var(--gap-lg);
-    }
-    .login-box-title {
-      font-size: var(--fs-sm);
-      color: var(--text);
-      margin-bottom: var(--gap-md);
-      line-height: 1.8;
-    }
-    .google-btn {
-      width: 100%;
-      background: var(--white);
-      border: 3px solid #ccc;
-      color: #1a1a2e;
-      font-family: 'Press Start 2P', monospace;
-      font-size: var(--fs-sm);
-      padding: var(--gap-md);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--gap-sm);
-      transition: border-color .15s, background .15s;
-      line-height: 1.8;
-    }
-    .google-btn:hover { border-color: var(--gold); background: #fff9ee; }
-    .google-icon { font-size: 20px; flex-shrink: 0; }
-    .login-note {
-      font-size: var(--fs-xs);
-      color: var(--muted);
-      margin-top: var(--gap-md);
-      line-height: 2.2;
-    }
-
-    /* ── 頂部 Header（登入後） ── */
-    #site-header {
-      width: 100%;
-      max-width: 700px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: var(--gap-lg);
-      flex-wrap: wrap;
-      gap: var(--gap-sm);
-    }
-    .site-title {
-      font-size: var(--fs-lg);
-      color: var(--gold);
-    }
-    .user-bar {
-      display: flex;
-      align-items: center;
-      gap: var(--gap-sm);
-    }
-    .user-name {
-      font-size: var(--fs-xs);
-      color: var(--muted);
-    }
-    .logout-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-family: 'Press Start 2P', monospace;
-      font-size: var(--fs-xs);
-      padding: 6px 12px;
-      cursor: pointer;
-      transition: border-color .15s, color .15s;
-    }
-    .logout-btn:hover { border-color: var(--red); color: var(--red); }
-
-    /* ── 主容器 ── */
-    #app {
-      width: 100%;
-      max-width: 700px;
-      background: var(--panel);
-      border: 3px solid var(--border);
-      padding: var(--gap-lg);
-    }
-
-    .topbar {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--gap-sm);
-      background: var(--panel2);
-      border: 2px solid var(--border);
-      padding: var(--gap-md);
-      margin-bottom: var(--gap-md);
-      flex-wrap: wrap;
-    }
-    .topbar-left { flex: 1; min-width: 0; }
-    .quest-label { font-size: var(--fs-xs); color: var(--gold); margin-bottom: 8px; }
-    .quest-title { font-size: var(--fs-md); color: var(--text); line-height: 1.6; }
-    .time-pill {
-      font-size: var(--fs-xs);
-      color: var(--muted);
-      border: 1px solid var(--border);
-      padding: 6px 12px;
-      white-space: nowrap;
-      align-self: flex-start;
-    }
-
-    .progress-wrap {
-      display: flex;
-      gap: var(--gap-sm);
-      align-items: center;
-      margin-bottom: var(--gap-md);
-    }
-    .pip {
-      flex: 1;
-      height: clamp(7px, 1.2vw, 11px);
-      background: #333;
-      border: 1px solid #444;
-    }
-    .pip.done { background: var(--gold); }
-    .pip.active { background: var(--gold); animation: pulse 1s ease-in-out infinite alternate; }
-    @keyframes pulse { from { opacity: 0.5 } to { opacity: 1 } }
-    .prog-txt { font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; flex-shrink: 0; }
-
-    .dialog {
-      background: var(--panel2);
-      border: 3px solid var(--text);
-      padding: var(--gap-md);
-      margin-bottom: var(--gap-md);
-    }
-    .speaker { font-size: var(--fs-sm); color: var(--gold); margin-bottom: var(--gap-sm); }
-    .dtext { font-size: var(--fs-sm); line-height: 2.6; color: var(--text); }
-    .cursor {
-      display: inline-block;
-      width: 0.65em; height: 1.1em;
-      background: var(--text);
-      animation: blink .8s step-end infinite;
-      vertical-align: middle;
-      margin-left: 3px;
-    }
-    @keyframes blink { 50% { opacity: 0 } }
-
-    .choices { display: flex; flex-direction: column; gap: var(--gap-sm); margin-bottom: var(--gap-sm); }
-    .cbtn {
-      background: var(--white);
-      border: 3px solid #ccc;
-      color: #1a1a2e;
-      font-family: 'Press Start 2P', monospace;
-      font-size: var(--fs-sm);
-      padding: var(--gap-md);
-      cursor: pointer;
-      text-align: left;
-      transition: border-color .15s, background .15s;
-      line-height: 2;
-      display: flex;
-      align-items: flex-start;
-      gap: var(--gap-sm);
-    }
-    .cbtn:hover { border-color: var(--gold); background: #fff9ee; }
-    .cbtn.selected { border-color: var(--gold); background: var(--gold); color: #1a1a2e; }
-    .cbtn.selected .carr { color: #1a1a2e; }
-    .carr { color: var(--gold); font-size: var(--fs-md); flex-shrink: 0; margin-top: 2px; }
-
-    .irow { display: flex; gap: var(--gap-sm); margin-bottom: var(--gap-sm); flex-wrap: wrap; }
-    .pinput {
-      flex: 1; min-width: 200px;
-      background: var(--white);
-      border: 3px solid #ccc;
-      color: #1a1a2e;
-      font-family: 'Press Start 2P', monospace;
-      font-size: var(--fs-sm);
-      padding: var(--gap-md);
-      outline: none;
-    }
-    .pinput:focus { border-color: var(--gold); }
-    .pinput::placeholder { color: #bbb; }
-
-    .pbtn {
-      background: var(--gold);
-      border: none;
-      color: #1a1a2e;
-      font-family: 'Press Start 2P', monospace;
-      font-size: var(--fs-sm);
-      padding: var(--gap-md) var(--gap-lg);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background .1s;
-    }
-    .pbtn:hover { background: var(--gold-dark); }
-
-    .toast {
-      background: var(--green);
-      border: 2px solid var(--green2);
-      color: #fff;
-      font-family: 'Press Start 2P', monospace;
-      font-size: var(--fs-xs);
-      padding: var(--gap-sm) var(--gap-md);
-      margin-bottom: var(--gap-sm);
-      animation: slideIn .3s ease;
-      line-height: 2.2;
-    }
-    @keyframes slideIn {
-      from { transform: translateY(-8px); opacity: 0 }
-      to   { transform: translateY(0); opacity: 1 }
-    }
-
-    .profile-card {
-      background: var(--panel2);
-      border: 3px solid var(--gold);
-      padding: var(--gap-lg);
-    }
-    .pc-title { font-size: var(--fs-md); color: var(--gold); margin-bottom: var(--gap-lg); text-align: center; }
-    .pc-row {
-      display: flex; align-items: flex-start; gap: var(--gap-md);
-      margin-bottom: var(--gap-md); padding-bottom: var(--gap-md);
-      border-bottom: 1px solid #2a2a4a;
-    }
-    .pc-row:last-of-type { border-bottom: none; }
-    .pc-lbl { font-size: var(--fs-xs); color: var(--muted); min-width: clamp(64px, 10vw, 96px); flex-shrink: 0; line-height: 2.2; }
-    .pc-val { font-size: var(--fs-sm); color: var(--text); line-height: 2.2; flex: 1; }
-    .pc-badge { display: inline-block; background: var(--gold); color: #1a1a2e; font-size: var(--fs-xs); padding: 4px 12px; margin-top: 8px; }
-
-    .reward-box {
-      background: #0d2b1a; border: 2px solid var(--green);
-      padding: var(--gap-lg); margin-top: var(--gap-md); text-align: center;
-    }
-    .reward-title { font-size: var(--fs-sm); color: var(--green2); margin-bottom: var(--gap-md); }
-    .xp-big { font-size: clamp(28px, 5vw, 44px); color: var(--gold); }
-    .xp-sub { font-size: var(--fs-xs); color: var(--muted); margin-top: 8px; }
-    .badge-row { display: flex; justify-content: center; gap: var(--gap-sm); margin-top: var(--gap-md); flex-wrap: wrap; }
-    .badge {
-      background: var(--panel2); border: 2px solid var(--gold);
-      font-size: var(--fs-xs); color: var(--gold);
-      padding: var(--gap-sm) var(--gap-md); text-align: center; line-height: 2;
-    }
-
-    .next-btn {
-      width: 100%; background: var(--gold); border: none;
-      color: #1a1a2e; font-family: 'Press Start 2P', monospace;
-      font-size: var(--fs-md); padding: var(--gap-md);
-      cursor: pointer; margin-top: var(--gap-md);
-      transition: background .1s; line-height: 1.8;
-    }
-    .next-btn:hover { background: var(--gold-dark); }
-
-    .coming-soon {
-      background: var(--panel2); border: 3px solid var(--border);
-      padding: var(--gap-lg); text-align: center; margin-top: 4px;
-    }
-    .cs-icon { font-size: clamp(40px, 7vw, 60px); margin-bottom: var(--gap-md); }
-    .cs-title { font-size: var(--fs-lg); color: var(--gold); margin-bottom: var(--gap-md); }
-    .cs-desc { font-size: var(--fs-sm); color: var(--muted); line-height: 2.6; }
-
-    /* ── Loading ── */
-    #loading-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 60vh;
-      gap: var(--gap-md);
-    }
-    .loading-txt { font-size: var(--fs-sm); color: var(--gold); animation: pulse 1s ease-in-out infinite alternate; }
-
-    .hidden { display: none !important; }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:var(--gap-lg) var(--gap-md) 80px;font-family:'Press Start 2P',monospace;color:var(--text);}
+    #login-screen{width:100%;max-width:480px;text-align:center;padding-top:10vh;}
+    .login-title{font-size:var(--fs-xl);color:var(--gold);margin-bottom:var(--gap-sm);line-height:1.6;}
+    .login-sub{font-size:var(--fs-xs);color:var(--muted);line-height:2.4;margin-bottom:var(--gap-lg);}
+    .login-box{background:var(--panel);border:3px solid var(--border);padding:var(--gap-lg);}
+    .login-box-title{font-size:var(--fs-sm);color:var(--text);margin-bottom:var(--gap-md);line-height:1.8;}
+    .google-btn{width:100%;background:var(--white);border:3px solid #ccc;color:#1a1a2e;font-family:'Press Start 2P',monospace;font-size:var(--fs-sm);padding:var(--gap-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:var(--gap-sm);transition:border-color .15s,background .15s;line-height:1.8;}
+    .google-btn:hover{border-color:var(--gold);background:#fff9ee;}
+    .login-note{font-size:var(--fs-xs);color:var(--muted);margin-top:var(--gap-md);line-height:2.2;}
+    #site-header{width:100%;max-width:700px;display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--gap-lg);flex-wrap:wrap;gap:var(--gap-sm);}
+    .site-title{font-size:var(--fs-lg);color:var(--gold);}
+    .user-bar{display:flex;align-items:center;gap:var(--gap-sm);}
+    .user-name{font-size:var(--fs-xs);color:var(--muted);}
+    .logout-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Press Start 2P',monospace;font-size:var(--fs-xs);padding:6px 12px;cursor:pointer;transition:border-color .15s,color .15s;}
+    .logout-btn:hover{border-color:var(--red);color:var(--red);}
+    #app{width:100%;max-width:700px;background:var(--panel);border:3px solid var(--border);padding:var(--gap-lg);}
+    .topbar{display:flex;align-items:flex-start;gap:var(--gap-sm);background:var(--panel2);border:2px solid var(--border);padding:var(--gap-md);margin-bottom:var(--gap-md);flex-wrap:wrap;}
+    .topbar-left{flex:1;min-width:0;}
+    .quest-label{font-size:var(--fs-xs);color:var(--gold);margin-bottom:8px;}
+    .quest-title{font-size:var(--fs-md);color:var(--text);line-height:1.6;}
+    .time-pill{font-size:var(--fs-xs);color:var(--muted);border:1px solid var(--border);padding:6px 12px;white-space:nowrap;align-self:flex-start;}
+    .progress-wrap{display:flex;gap:var(--gap-sm);align-items:center;margin-bottom:var(--gap-md);}
+    .pip{flex:1;height:clamp(7px,1.2vw,11px);background:#333;border:1px solid #444;}
+    .pip.done{background:var(--gold);}
+    .pip.active{background:var(--gold);animation:pulse 1s ease-in-out infinite alternate;}
+    @keyframes pulse{from{opacity:.5}to{opacity:1}}
+    .prog-txt{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap;flex-shrink:0;}
+    .dialog{background:var(--panel2);border:3px solid var(--text);padding:var(--gap-md);margin-bottom:var(--gap-md);}
+    .speaker{font-size:var(--fs-sm);color:var(--gold);margin-bottom:var(--gap-sm);}
+    .dtext{font-size:var(--fs-sm);line-height:2.6;color:var(--text);}
+    .cursor{display:inline-block;width:.65em;height:1.1em;background:var(--text);animation:blink .8s step-end infinite;vertical-align:middle;margin-left:3px;}
+    @keyframes blink{50%{opacity:0}}
+    .choices{display:flex;flex-direction:column;gap:var(--gap-sm);margin-bottom:var(--gap-sm);}
+    .cbtn{background:var(--white);border:3px solid #ccc;color:#1a1a2e;font-family:'Press Start 2P',monospace;font-size:var(--fs-sm);padding:var(--gap-md);cursor:pointer;text-align:left;transition:border-color .15s,background .15s;line-height:2;display:flex;align-items:flex-start;gap:var(--gap-sm);}
+    .cbtn:hover{border-color:var(--gold);background:#fff9ee;}
+    .cbtn.selected{border-color:var(--gold);background:var(--gold);color:#1a1a2e;}
+    .cbtn.selected .carr{color:#1a1a2e;}
+    .carr{color:var(--gold);font-size:var(--fs-md);flex-shrink:0;margin-top:2px;}
+    .irow{display:flex;gap:var(--gap-sm);margin-bottom:var(--gap-sm);flex-wrap:wrap;}
+    .pinput{flex:1;min-width:200px;background:var(--white);border:3px solid #ccc;color:#1a1a2e;font-family:'Press Start 2P',monospace;font-size:var(--fs-sm);padding:var(--gap-md);outline:none;}
+    .pinput:focus{border-color:var(--gold);}
+    .pinput::placeholder{color:#bbb;}
+    .pbtn{background:var(--gold);border:none;color:#1a1a2e;font-family:'Press Start 2P',monospace;font-size:var(--fs-sm);padding:var(--gap-md) var(--gap-lg);cursor:pointer;white-space:nowrap;transition:background .1s;}
+    .pbtn:hover{background:var(--gold-dark);}
+    .toast{background:var(--green);border:2px solid var(--green2);color:#fff;font-family:'Press Start 2P',monospace;font-size:var(--fs-xs);padding:var(--gap-sm) var(--gap-md);margin-bottom:var(--gap-sm);animation:slideIn .3s ease;line-height:2.2;}
+    @keyframes slideIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .profile-card{background:var(--panel2);border:3px solid var(--gold);padding:var(--gap-lg);}
+    .pc-title{font-size:var(--fs-md);color:var(--gold);margin-bottom:var(--gap-lg);text-align:center;}
+    .pc-row{display:flex;align-items:flex-start;gap:var(--gap-md);margin-bottom:var(--gap-md);padding-bottom:var(--gap-md);border-bottom:1px solid #2a2a4a;}
+    .pc-row:last-of-type{border-bottom:none;}
+    .pc-lbl{font-size:var(--fs-xs);color:var(--muted);min-width:clamp(64px,10vw,96px);flex-shrink:0;line-height:2.2;}
+    .pc-val{font-size:var(--fs-sm);color:var(--text);line-height:2.2;flex:1;}
+    .pc-badge{display:inline-block;background:var(--gold);color:#1a1a2e;font-size:var(--fs-xs);padding:4px 12px;margin-top:8px;}
+    .reward-box{background:#0d2b1a;border:2px solid var(--green);padding:var(--gap-lg);margin-top:var(--gap-md);text-align:center;}
+    .reward-title{font-size:var(--fs-sm);color:var(--green2);margin-bottom:var(--gap-md);}
+    .xp-big{font-size:clamp(28px,5vw,44px);color:var(--gold);}
+    .xp-sub{font-size:var(--fs-xs);color:var(--muted);margin-top:8px;}
+    .badge-row{display:flex;justify-content:center;gap:var(--gap-sm);margin-top:var(--gap-md);flex-wrap:wrap;}
+    .badge{background:var(--panel2);border:2px solid var(--gold);font-size:var(--fs-xs);color:var(--gold);padding:var(--gap-sm) var(--gap-md);text-align:center;line-height:2;}
+    .next-btn{width:100%;background:var(--gold);border:none;color:#1a1a2e;font-family:'Press Start 2P',monospace;font-size:var(--fs-md);padding:var(--gap-md);cursor:pointer;margin-top:var(--gap-md);transition:background .1s;line-height:1.8;}
+    .next-btn:hover{background:var(--gold-dark);}
+    .coming-soon{background:var(--panel2);border:3px solid var(--border);padding:var(--gap-lg);text-align:center;margin-top:4px;}
+    .cs-icon{font-size:clamp(40px,7vw,60px);margin-bottom:var(--gap-md);}
+    .cs-title{font-size:var(--fs-lg);color:var(--gold);margin-bottom:var(--gap-md);}
+    .cs-desc{font-size:var(--fs-sm);color:var(--muted);line-height:2.6;}
+    #loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:var(--gap-md);}
+    .loading-txt{font-size:var(--fs-sm);color:var(--gold);animation:pulse 1s ease-in-out infinite alternate;}
+    .hidden{display:none!important;}
   </style>
 </head>
 <body>
 
-  <!-- 載入中 -->
   <div id="loading-screen">
     <div class="loading-txt">🏪 載入中...</div>
   </div>
 
-  <!-- 登入畫面 -->
   <div id="login-screen" class="hidden">
     <div class="login-title">🏪 letsopen-RPG</div>
     <div class="login-sub">從零開始・手把手・帶你開店</div>
@@ -347,7 +106,6 @@
     </div>
   </div>
 
-  <!-- 遊戲畫面 -->
   <div id="game-screen" class="hidden" style="width:100%;max-width:700px;">
     <div id="site-header">
       <div class="site-title">🏪 letsopen-RPG</div>
@@ -356,7 +114,6 @@
         <button class="logout-btn" onclick="logout()">登出</button>
       </div>
     </div>
-
     <div id="app">
       <div class="topbar">
         <div class="topbar-left">
@@ -365,7 +122,6 @@
         </div>
         <div class="time-pill">⏱ 約 30 分鐘</div>
       </div>
-
       <div class="progress-wrap">
         <div class="pip active" id="p0"></div>
         <div class="pip" id="p1"></div>
@@ -374,101 +130,226 @@
         <div class="pip" id="p4"></div>
         <span class="prog-txt" id="prog-txt">問題 1 / 5</span>
       </div>
-
       <div id="toast-area"></div>
-
       <div class="dialog">
         <div class="speaker" id="speaker">村長 老王</div>
-        <div class="dtext" id="dtext">
-          勇者，歡迎來到開店冒險！<br>
-          在我們出發之前，<br>
-          讓我先認識一下你吧。<br>
-          你希望我怎麼稱呼你？
-          <span class="cursor"></span>
-        </div>
+        <div class="dtext" id="dtext">勇者，歡迎來到開店冒險！<br>在我們出發之前，<br>讓我先認識一下你吧。<br>你希望我怎麼稱呼你？<span class="cursor"></span></div>
       </div>
-
       <div id="action-area"></div>
     </div>
   </div>
 
-  <script>
-    // ── Supabase 初始化 ──
-    const SUPABASE_URL = 'https://dwcevlrzwqngkmdguijw.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2V2bHJ6d3FuZ2ttZGd1aWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMjk0MTcsImV4cCI6MjA5MjYwNTQxN30.qXqgMp0DUw-iyRy6r6Lszh7r5GDbMLqZft5e1VUH8b4';
-    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+<script>
+  // ── Supabase ──
+  const SUPABASE_URL = 'https://dwcevlrzwqngkmdguijw.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2V2bHJ6d3FuZ2ttZGd1aWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMjk0MTcsImV4cCI6MjA5MjYwNTQxN30.qXqgMp0DUw-iyRy6r6Lszh7r5GDbMLqZft5e1VUH8b4';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let currentUser = null;
+  let currentUser = null;
+  const G = { name:'', status:'', exp:'', reason:'', strength:'', xp:0 };
 
-    const G = { name:'', status:'', exp:'', reason:'', strength:'', xp:0 };
+  // ── 登入登出 ──
+  async function loginWithGoogle() {
+    await db.auth.signInWithOAuth({ provider:'google', options:{ redirectTo:'https://letsopen-rpg.vercel.app' } });
+  }
+  async function logout() {
+    await db.auth.signOut();
+    location.reload();
+  }
 
-    // ── 登入/登出 ──
-    async function loginWithGoogle() {
-      await db.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: 'https://letsopen-rpg.vercel.app' }
-      });
+  // ── 儲存 / 讀取進度 ──
+  async function saveProgress() {
+    if (!currentUser) return;
+    await db.from('user_progress').upsert({
+      user_id: currentUser.id, current_quest:1, xp:G.xp,
+      profile:{ name:G.name, status:G.status, exp:G.exp, reason:G.reason, strength:G.strength },
+      updated_at: new Date().toISOString()
+    }, { onConflict:'user_id' });
+  }
+  async function loadProgress() {
+    if (!currentUser) return null;
+    try {
+      const { data } = await db.from('user_progress').select('*').eq('user_id', currentUser.id).maybeSingle();
+      return data;
+    } catch(e) { return null; }
+  }
+
+  // ── 畫面切換 ──
+  function showScreen(name) {
+    ['loading','login','game'].forEach(s => {
+      const el = document.getElementById(s+'-screen');
+      if (el) el.classList.add('hidden');
+    });
+    const target = document.getElementById(name+'-screen');
+    if (target) target.classList.remove('hidden');
+  }
+
+  // ── 遊戲 UI 工具 ──
+  const pip = i => document.getElementById('p'+i);
+  const progTxt = document.getElementById('prog-txt');
+  const speaker = document.getElementById('speaker');
+  const dtext = document.getElementById('dtext');
+  const actionArea = document.getElementById('action-area');
+  const toastArea = document.getElementById('toast-area');
+
+  function setDialog(sp, txt) {
+    speaker.textContent = sp;
+    dtext.innerHTML = txt + '<span class="cursor"></span>';
+  }
+  function clearAction() { actionArea.innerHTML = ''; }
+  function showChoices(arr) {
+    clearAction();
+    const div = document.createElement('div'); div.className = 'choices';
+    arr.forEach(c => {
+      const b = document.createElement('button'); b.className = 'cbtn';
+      b.innerHTML = '<span class="carr">▶</span>' + c.label;
+      b.onclick = () => { div.querySelectorAll('.cbtn').forEach(x => x.classList.remove('selected')); b.classList.add('selected'); setTimeout(() => c.action(), 300); };
+      div.appendChild(b);
+    });
+    actionArea.appendChild(div);
+  }
+  function showInput(ph, cb) {
+    clearAction();
+    const row = document.createElement('div'); row.className = 'irow';
+    const inp = document.createElement('input'); inp.className = 'pinput'; inp.placeholder = ph;
+    const btn = document.createElement('button'); btn.className = 'pbtn'; btn.textContent = '確定 ▶';
+    const go = () => { const v = inp.value.trim(); if (!v) return; btn.onclick = null; inp.onkeydown = null; cb(v); };
+    btn.onclick = go; inp.onkeydown = e => { if (e.key === 'Enter') go(); };
+    row.appendChild(inp); row.appendChild(btn); actionArea.appendChild(row);
+    setTimeout(() => inp.focus(), 100);
+  }
+  function toast(msg) {
+    const t = document.createElement('div'); t.className = 'toast'; t.innerHTML = msg;
+    toastArea.appendChild(t); setTimeout(() => t.remove(), 3000);
+  }
+  function advancePip(i) {
+    if (i > 0) { pip(i-1).classList.remove('active'); pip(i-1).classList.add('done'); }
+    if (i < 5) pip(i).classList.add('active');
+    progTxt.textContent = '問題 ' + (i+1) + ' / 5';
+  }
+
+  // ── 關卡 1 邏輯 ──
+  function step0() {
+    advancePip(0);
+    if (G.name && G.status && G.exp && G.reason && G.strength) {
+      setDialog('村長 老王', '歡迎回來，' + G.name + '！<br>你的進度已經恢復了！');
+      setTimeout(() => showResult(), 600);
+      return;
     }
+    setDialog('村長 老王', '勇者，歡迎來到開店冒險！<br>在我們出發之前，<br>讓我先認識一下你吧。<br>你希望我怎麼稱呼你？');
+    showInput('輸入你的稱呼或小名...', v => {
+      G.name = v; toast('★ 勇者「' + v + '」正式登錄！');
+      setDialog('村長 老王', '「' + v + '」！這個名字很有力量！<br>很高興認識你～<br>那我先問問你，<br>目前你是什麼狀態呢？');
+      setTimeout(() => step1(), 400);
+    });
+  }
+  function step1() {
+    advancePip(1);
+    showChoices([
+      { label:'還在上班，利用空閒時間規劃', action:() => pickStatus('還在上班，利用空閒時間規劃') },
+      { label:'已離職，全心全意準備開店',   action:() => pickStatus('已離職，全心全意準備開店') },
+      { label:'想先兼職創業，評估可行性',   action:() => pickStatus('兼職創業，邊走邊評估') },
+      { label:'其他狀況（還在想）',         action:() => pickStatus('其他，仍在規劃中') },
+    ]);
+  }
+  function pickStatus(s) {
+    G.status = s; G.xp += 20; toast('+20 XP！狀態確認完成');
+    setDialog('老王', '了解！' + G.name + '，<br>「' + s + '」<br>每個狀態都有它的優勢。<br>接下來——<br>你有沒有餐飲相關的經驗呢？');
+    setTimeout(() => step2(), 300);
+  }
+  function step2() {
+    advancePip(2);
+    showChoices([
+      { label:'有正職餐飲工作經驗（1年以上）', action:() => pickExp('有正職餐飲工作經驗') },
+      { label:'有打工或兼職經驗',               action:() => pickExp('有打工或兼職餐飲經驗') },
+      { label:'在家常做飯，對飲食很有熱情',     action:() => pickExp('在家料理，對飲食充滿熱情') },
+      { label:'完全沒有，但我有強烈的學習意願', action:() => pickExp('無相關經驗，但學習意願強') },
+    ]);
+  }
+  function pickExp(e) {
+    G.exp = e; G.xp += 20; toast('+20 XP！經驗值記錄完成');
+    setDialog('老王', '收到！「' + e + '」<br>這些都是寶貴的資本。<br><br>現在我想更了解你——<br>是什麼讓你萌生了<br>開店的念頭呢？');
+    setTimeout(() => step3(), 300);
+  }
+  function step3() {
+    advancePip(3);
+    showInput('說說你的故事，不用太長...', v => {
+      G.reason = v; G.xp += 30; toast('+30 XP！開店動機解鎖！');
+      setDialog('老王', '「' + v + '」<br><br>謝謝你的分享。<br>這份初心會是你<br>撐過難關的力量。<br><br>最後一題——<br>你覺得自己最大的優勢是什麼？');
+      setTimeout(() => step4(), 400);
+    });
+  }
+  function step4() {
+    advancePip(4);
+    showChoices([
+      { label:'很會跟人互動，親和力強',   action:() => pickStrength('親和力強，擅長人際互動') },
+      { label:'對數字敏感，擅長分析規劃', action:() => pickStrength('數字敏感，擅長分析規劃') },
+      { label:'有創意，擅長設計和品牌感', action:() => pickStrength('有創意，擅長品牌與設計') },
+      { label:'執行力強，說到做到',       action:() => pickStrength('執行力強，行動派') },
+      { label:'廚藝或手藝很好',           action:() => pickStrength('廚藝或手藝出色') },
+    ]);
+  }
+  async function pickStrength(s) {
+    G.strength = s; G.xp += 30;
+    clearAction();
+    [0,1,2,3,4].forEach(i => { pip(i).classList.remove('active'); pip(i).classList.add('done'); });
+    progTxt.textContent = '完成！';
+    setDialog('老王', '「' + s + '」<br>這正是你的核心武器！<br><br>' + G.name + '，<br>你的冒險者檔案<br>已經建立完成了！');
+    await saveProgress();
+    toast('💾 進度已儲存！');
+    setTimeout(() => showResult(), 800);
+  }
+  function showResult() {
+    clearAction();
+    const statusMap = {
+      '還在上班，利用空閒時間規劃':'穩健型','已離職，全心全意準備開店':'全力衝刺型',
+      '兼職創業，邊走邊評估':'彈性探索型','其他，仍在規劃中':'蓄勢待發型'
+    };
+    const typeLabel = statusMap[G.status] || '探索型';
+    const card = document.createElement('div'); card.className = 'profile-card';
+    card.innerHTML = `
+      <div class="pc-title">★ 冒險者檔案 ★</div>
+      <div class="pc-row"><div class="pc-lbl">稱呼</div><div class="pc-val">${G.name}<div class="pc-badge">${typeLabel}創業者</div></div></div>
+      <div class="pc-row"><div class="pc-lbl">目前狀態</div><div class="pc-val">${G.status}</div></div>
+      <div class="pc-row"><div class="pc-lbl">餐飲經驗</div><div class="pc-val">${G.exp}</div></div>
+      <div class="pc-row"><div class="pc-lbl">開店動機</div><div class="pc-val">${G.reason}</div></div>
+      <div class="pc-row"><div class="pc-lbl">核心優勢</div><div class="pc-val">${G.strength}</div></div>
+      <div class="reward-box">
+        <div class="reward-title">★ 關卡完成獎勵 ★</div>
+        <div class="xp-big">+${G.xp} XP</div>
+        <div class="xp-sub">獲得成就</div>
+        <div class="badge-row">
+          <div class="badge">自我認知者<br>徽章</div>
+          <div class="badge">冒險者<br>檔案解鎖</div>
+        </div>
+      </div>
+      <button class="next-btn" onclick="showComingSoon()">前往關卡 2 ▶</button>
+    `;
+    actionArea.appendChild(card);
+    toast('★ 關卡 1 完成！進度已儲存！');
+  }
+  function showComingSoon() {
+    actionArea.innerHTML = `
+      <div class="coming-soon">
+        <div class="cs-icon">🔒</div>
+        <div class="cs-title">關卡 2 即將開放！</div>
+        <div class="cs-desc">下一關：確定開店類型<br>與目標客群<br><br>敬請期待 ★</div>
+      </div>
+    `;
+  }
 
-    async function logout() {
-      await db.auth.signOut();
-      location.reload();
-    }
-
-    // ── 儲存進度 ──
-    async function saveProgress() {
-      if (!currentUser) return;
-      await db.from('user_progress').upsert({
-        user_id: currentUser.id,
-        current_quest: 1,
-        xp: G.xp,
-        profile: {
-          name: G.name,
-          status: G.status,
-          exp: G.exp,
-          reason: G.reason,
-          strength: G.strength
-        },
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id' });
-    }
-
-    // ── 讀取進度 ──
-    async function loadProgress() {
-      if (!currentUser) return null;
-      try {
-        const { data, error } = await db
-          .from('user_progress')
-          .select('*')
-          .eq('user_id', currentUser.id)
-          .maybeSingle();
-        if (error) { console.log('loadProgress error', error); return null; }
-        return data;
-      } catch(e) {
-        console.log('loadProgress exception', e);
-        return null;
-      }
-    }
-
-    // ── 畫面切換 ──
-    function showScreen(name) {
-      document.getElementById('loading-screen').classList.add('hidden');
-      document.getElementById('login-screen').classList.add('hidden');
-      document.getElementById('game-screen').classList.add('hidden');
-      document.getElementById(name + '-screen').classList.remove('hidden');
-    }
-
-    // ── 初始化 ──
-    async function startGame(session) {
-      try {
-        console.log('startGame called', session.user.email);
+  // ── 啟動 ──
+  window.addEventListener('load', async () => {
+    // 最多等 4 秒
+    const t = setTimeout(() => showScreen('login'), 4000);
+    try {
+      const { data:{ session } } = await db.auth.getSession();
+      clearTimeout(t);
+      if (session) {
         currentUser = session.user;
-        const email = currentUser.email || '';
-        const displayName = currentUser.user_metadata?.full_name || email.split('@')[0];
+        const displayName = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
         document.getElementById('user-name').textContent = displayName;
-
         const progress = await loadProgress();
-        console.log('progress loaded', progress);
         if (progress?.profile?.name) {
           G.name = progress.profile.name;
           G.status = progress.profile.status || '';
@@ -477,54 +358,16 @@
           G.strength = progress.profile.strength || '';
           G.xp = progress.xp || 0;
         }
-
-        console.log('showing game screen');
         showScreen('game');
-        setTimeout(() => step0(), 100);
-      } catch (e) {
-        console.error('startGame error', e);
+        step0();
+      } else {
         showScreen('login');
       }
+    } catch(e) {
+      clearTimeout(t);
+      showScreen('login');
     }
-
-    // 啟動
-    window.addEventListener('load', async () => {
-      console.log('page loaded, starting init');
-
-      // 最多等 4 秒
-      const t = setTimeout(() => {
-        console.log('timeout!');
-        showScreen('login');
-      }, 4000);
-
-      try {
-        // 先檢查現有 session
-        const { data: { session }, error } = await db.auth.getSession();
-        console.log('getSession done', session?.user?.email, error);
-        clearTimeout(t);
-
-        if (session) {
-          await startGame(session);
-        } else {
-          showScreen('login');
-        }
-
-        // 再監聽之後的狀態變化
-        db.auth.onAuthStateChange(async (event, session) => {
-          console.log('auth change:', event, session?.user?.email);
-          if (event === 'SIGNED_IN' && session) {
-            await startGame(session);
-          } else if (event === 'SIGNED_OUT') {
-            location.reload();
-          }
-        });
-
-      } catch(e) {
-        console.error('init error:', e);
-        clearTimeout(t);
-        showScreen('login');
-      }
-    });
-  </script>
+  });
+</script>
 </body>
 </html>
